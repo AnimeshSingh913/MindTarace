@@ -1,0 +1,10 @@
+[project]
+name = "mindtrace"
+version = "1.0.0"
+description = "Explains why reasoning went wrong, without ever giving the answer."
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"

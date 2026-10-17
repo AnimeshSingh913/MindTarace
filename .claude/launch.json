@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "mindtrace-api-mock",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "uvicorn", "mindtrace.main:app", "--port", "8000", "--app-dir", "backend"],
+      "env": { "MINDTRACE_MOCK_LLM": "true" },
+      "port": 8000
+    },
+    {
+      "name": "mindtrace-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "frontend", "run", "dev"],
+      "port": 5173
+    }
+  ]
+}

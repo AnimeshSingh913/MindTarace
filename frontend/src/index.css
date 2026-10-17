@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: 40 33% 98%;
+    --surface: 0 0% 100%;
+    --muted: 40 20% 94%;
+    --border: 35 14% 86%;
+    --fg: 230 25% 12%;
+    --subtle: 230 9% 42%;
+    --accent: 243 75% 59%;
+    --accent-fg: 0 0% 100%;
+    --accent-soft: 243 90% 96%;
+    --warn: 32 95% 38%;
+    --warn-soft: 40 96% 93%;
+    --danger: 0 72% 46%;
+    --ok: 152 60% 34%;
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: 230 22% 8%;
+      --surface: 230 20% 11%;
+      --muted: 230 16% 15%;
+      --border: 230 13% 22%;
+      --fg: 40 20% 94%;
+      --subtle: 230 10% 66%;
+      --accent: 243 90% 72%;
+      --accent-fg: 230 30% 10%;
+      --accent-soft: 243 40% 20%;
+      --warn: 38 92% 62%;
+      --warn-soft: 35 50% 16%;
+      --danger: 0 80% 66%;
+      --ok: 152 55% 55%;
+      color-scheme: dark;
+    }
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-bg font-sans text-fg antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+  ::selection {
+    @apply bg-accent/25;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent/60 ring-offset-2 ring-offset-bg;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
+  }
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-subtle;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition
+      disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .btn-primary {
+    @apply btn bg-accent text-accent-fg shadow-sm hover:bg-accent/90 active:translate-y-px;
+  }
+  .btn-ghost {
+    @apply btn border border-border bg-surface text-fg hover:bg-muted;
+  }
+  .field {
+    @apply w-full resize-y rounded-lg border border-border bg-surface px-4 py-3 text-sm leading-relaxed
+      text-fg placeholder:text-subtle/70 transition focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20;
+  }
+  .skeleton {
+    @apply rounded-md bg-muted;
+    background-image: linear-gradient(90deg, transparent, hsl(var(--border) / 0.6), transparent);
+    background-size: 400px 100%;
+    background-repeat: no-repeat;
+    animation: shimmer 1.4s linear infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
