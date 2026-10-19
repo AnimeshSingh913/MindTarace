@@ -25,7 +25,7 @@ export interface Health {
   llm: { runtime: string; reachable: boolean; model_ready: boolean; judge_ready: boolean; model?: string };
 }
 
-export type ApiErrorKind = "network" | "timeout" | "unavailable" | "model" | "validation" | "server";
+export type ApiErrorKind = "network" | "timeout" | "unavailable" | "model" | "validation" | "rate_limited" | "server";
 
 export class ApiError extends Error {
   constructor(
@@ -64,6 +64,11 @@ async function toApiError(res: Response): Promise<ApiError> {
   if (res.status === 503) return new ApiError("unavailable", detail || "The model runtime is unavailable.", 503);
   if (res.status === 502) return new ApiError("model", detail || "The model returned an unusable response.", 502);
   if (res.status === 422) return new ApiError("validation", detail || "Please check your input.", 422);
+  if (res.status === 429) {
+    const wait = Number(res.headers.get("Retry-After"));
+    const hint = wait > 0 ? ` You can try again in about ${wait < 90 ? `${wait} seconds` : `${Math.ceil(wait / 60)} minutes`}.` : "";
+    return new ApiError("rate_limited", (detail || "Too many requests.") + hint, 429);
+  }
   return new ApiError("server", detail || `Server error (${res.status}).`, res.status);
 }
 
@@ -88,9 +93,14 @@ export async function analyze(
     if (err instanceof ApiError) throw err;
     if (err instanceof DOMException && err.name === "AbortError") {
       if (signal?.aborted) throw err; // cancelled by the user: let the caller ignore it
-      throw new ApiError("timeout", "The analysis took too long. Small local models on CPU can be slow; try again.");
+      throw new ApiError("timeout", "The analysis took too long. Please try again.");
     }
-    throw new ApiError("network", "Can't reach the MindTrace server. Is the backend running on port 8000?");
+    throw new ApiError(
+      "network",
+      BASE
+        ? "Can't reach the MindTrace server. If it was idle it may be waking up; try again in a moment."
+        : "Can't reach the MindTrace server. Is the backend running on port 8000?",
+    );
   } finally {
     clearTimeout(timer);
     signal?.removeEventListener("abort", onAbort);

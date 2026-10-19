@@ -34,7 +34,7 @@ const LoadingSkeleton = () => (
         <div className="skeleton h-3 w-5/6" />
       </div>
     ))}
-    <p className="text-xs text-subtle">Local models can take 5–30 seconds on CPU.</p>
+    <p className="text-xs text-subtle">This usually takes a few seconds.</p>
   </div>
 );
 
@@ -190,7 +190,11 @@ export const Analyzer = () => {
               <div role="alert" className="flex h-full min-h-[360px] flex-col items-center justify-center gap-3 text-center">
                 <AlertTriangle className="h-6 w-6 text-danger" />
                 <p className="text-sm font-semibold">
-                  {state.error.kind === "validation" ? "Check your input" : "Something went wrong"}
+                  {state.error.kind === "validation"
+                    ? "Check your input"
+                    : state.error.kind === "rate_limited"
+                      ? "Slow down a little"
+                      : "Something went wrong"}
                 </p>
                 <p className="max-w-sm text-sm text-subtle">{state.error.message}</p>
                 <button type="button" className="btn-ghost mt-2" onClick={submit} disabled={!canSubmit}>

@@ -4,12 +4,16 @@ import { Logo } from "./Logo";
 
 function describe(health: Health | null | undefined): { tone: string; text: string; title: string } {
   if (health === undefined) return { tone: "bg-subtle", text: "Checking…", title: "Checking the server" };
-  if (health === null) return { tone: "bg-danger", text: "Server offline", title: "Start the backend on port 8000" };
+  if (health === null) return { tone: "bg-danger", text: "Server offline", title: "The MindTrace API is not responding" };
   const { llm } = health;
+  const local = llm.runtime === "ollama";
   if (llm.runtime === "mock") return { tone: "bg-warn", text: "Mock mode", title: "MINDTRACE_MOCK_LLM is on: answers are canned" };
-  if (!llm.reachable) return { tone: "bg-danger", text: "Ollama offline", title: "Run `ollama serve`" };
-  if (!llm.model_ready) return { tone: "bg-warn", text: "Model missing", title: `Run: ollama pull ${llm.model ?? ""}` };
-  if (!llm.judge_ready) return { tone: "bg-warn", text: "Judge missing", title: "Some answers may be withheld until the judge model is pulled" };
+  if (!llm.reachable)
+    return { tone: "bg-danger", text: local ? "Ollama offline" : "AI offline", title: local ? "Run `ollama serve`" : "The model provider is not reachable" };
+  if (!llm.model_ready)
+    return { tone: "bg-warn", text: "Model missing", title: local ? `Run: ollama pull ${llm.model ?? ""}` : `Check MINDTRACE_MODEL (${llm.model ?? ""})` };
+  if (!llm.judge_ready)
+    return { tone: "bg-warn", text: "Judge missing", title: "Some answers may be withheld until the judge model is available" };
   return { tone: "bg-ok", text: "Ready", title: `Model ${llm.model ?? ""} ready` };
 }
 

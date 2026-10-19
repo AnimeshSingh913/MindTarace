@@ -18,7 +18,7 @@ const App = () => (
       <span className="flex items-center gap-2 font-semibold text-fg">
         <Logo className="h-5 w-5" /> MindTrace
       </span>
-      <span>Explains mistakes. Never gives answers. Runs locally with Ollama.</span>
+      <span>Explains mistakes. Never gives answers.</span>
     </footer>
   </div>
 );

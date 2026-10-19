@@ -1,0 +1,40 @@
+# Render Blueprint for the MindTrace API.
+# Render dashboard -> New -> Blueprint -> pick this repo. Values marked `sync: false`
+# are asked for during setup and never stored in the repo.
+services:
+  - type: web
+    name: mindtrace-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    # --proxy-headers + FORWARDED_ALLOW_IPS make rate limits see the visitor's IP
+    # instead of Render's proxy.
+    startCommand: uvicorn mindtrace.main:app --host 0.0.0.0 --port $PORT --proxy-headers
+    healthCheckPath: /api/live
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: FORWARDED_ALLOW_IPS
+        value: "*"
+      - key: MINDTRACE_PROVIDER
+        value: openai
+      # Any OpenAI-compatible endpoint. Groq shown; OpenRouter is https://openrouter.ai/api/v1
+      - key: MINDTRACE_OPENAI_BASE_URL
+        value: https://api.groq.com/openai/v1
+      - key: MINDTRACE_OPENAI_API_KEY
+        sync: false
+      # A model ID from your provider's model list.
+      - key: MINDTRACE_MODEL
+        sync: false
+      # Your Vercel URL(s), comma-separated, e.g. https://mindtrace.vercel.app
+      - key: MINDTRACE_CORS_ORIGINS
+        sync: false
+      - key: MINDTRACE_RATE_LIMIT_PER_MINUTE
+        value: "5"
+      - key: MINDTRACE_RATE_LIMIT_PER_HOUR
+        value: "40"
+      - key: MINDTRACE_DAILY_REQUEST_CAP
+        value: "500"
+      - key: MINDTRACE_LLM_TIMEOUT_S
+        value: "60"

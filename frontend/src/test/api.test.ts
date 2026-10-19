@@ -27,6 +27,16 @@ describe("analyze()", () => {
     expect(err.kind).toBe(kind);
   });
 
+  it("adds a wait hint from Retry-After on 429", async () => {
+    mockFetch(
+      async () =>
+        new Response(JSON.stringify({ detail: "Too many analyses." }), { status: 429, headers: { "Retry-After": "42" } }),
+    );
+    const err = await analyze(body).catch((e) => e);
+    expect(err.kind).toBe("rate_limited");
+    expect(err.message).toBe("Too many analyses. You can try again in about 42 seconds.");
+  });
+
   it("formats pydantic validation details", async () => {
     const detail = [{ loc: ["body", "problem"], msg: "Value error, must not be empty" }];
     mockFetch(async () => new Response(JSON.stringify({ detail }), { status: 422 }));
